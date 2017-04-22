@@ -67,7 +67,7 @@ module S64X7(
     output  [7:0]   sel_o,
     output          we_o,
     output          vpa_o,
-//    output  [3:0]   opc_o,
+    output  [3:0]   opc_o,
     output  [63:0]  dat_o
 );
   wire [3:0] opc_o;
@@ -168,14 +168,19 @@ module S64X7(
 
 
   always @(*) begin
+    adr_o <= 0;
+    cyc_o <= 0;
+    we_o <= 0;
+    vpa_o <= 0;
+    sel_o <= 0;
+    dat_o <= 64'd0;
+
     casez({reset_i, is_instr_fetch})
     2'b1?: begin
       adr_o <= p;
       cyc_o <= 1;
-      we_o <= 0;
       vpa_o <= 1;
       sel_o <= 8'hFF;
-      dat_o <= 64'd0;
 
       nia <= ia;
       np <= 61'h1C00_0000_0000_0000; // 64'hE000_0000_0000_0000
@@ -205,10 +210,8 @@ module S64X7(
     2'b01: begin
       adr_o <= p;
       cyc_o <= 1;
-      we_o <= 0;
       vpa_o <= 1;
       sel_o <= 8'hFF;
-      dat_o <= 64'd0;
 
       nia <= p;
       np <= p + 1;
@@ -238,13 +241,6 @@ module S64X7(
     2'b00: begin
       case(opcode)
       `OPC_NOP: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-        dat_o <= 64'd0;
-
         nia <= ia;
         np <= p;
         nt <= t+1;
@@ -272,13 +268,6 @@ module S64X7(
       end
 
       `OPC_LIT8: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-        dat_o <= 64'd0;
-
         nia <= ia;
         np <= p;
         nt <= t+1;
@@ -306,13 +295,6 @@ module S64X7(
       end
 
       `OPC_LIT16: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-        dat_o <= 64'd0;
-
         nia <= ia;
         np <= p;
         nt <= t+1;
@@ -340,13 +322,6 @@ module S64X7(
       end
 
       `OPC_LIT32: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-        dat_o <= 64'd0;
-
         nia <= ia;
         np <= p;
         nt <= t+1;
@@ -379,7 +354,6 @@ module S64X7(
           adr_o <= z[63:3];
           cyc_o <= 1;
           we_o <= 1;
-          vpa_o <= 0;
           sel_o <= 1 << z[2:0];
           dat_o <= {8{y[7:0]}};
 
@@ -412,7 +386,6 @@ module S64X7(
           adr_o <= z[63:3];
           cyc_o <= 1;
           we_o <= 1;
-          vpa_o <= 0;
           sel_o <= 3 << {z[2:1], 1'b0};
           dat_o <= {4{y[15:0]}};
 
@@ -445,7 +418,6 @@ module S64X7(
           adr_o <= z[63:3];
           cyc_o <= 1;
           we_o <= 1;
-          vpa_o <= 0;
           sel_o <= 15 << {z[2], 2'b0};
           dat_o <= {2{y[31:0]}};
 
@@ -478,7 +450,6 @@ module S64X7(
           adr_o <= z[63:3];
           cyc_o <= 1;
           we_o <= 1;
-          vpa_o <= 0;
           sel_o <= 8'b11111111;
           dat_o <= y;
 
@@ -515,8 +486,6 @@ module S64X7(
         `N_LBMU: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 1 << z[2:0];
 
           nia <= ia;
@@ -547,8 +516,6 @@ module S64X7(
         `N_LHMU: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 3 << {z[2:1], 1'b0};
 
           nia <= ia;
@@ -579,8 +546,6 @@ module S64X7(
         `N_LWMU: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 15 << {z[2], 2'b0};
 
           nia <= ia;
@@ -611,8 +576,6 @@ module S64X7(
         `N_LDMU: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 8'b11111111;
 
           nia <= ia;
@@ -643,8 +606,6 @@ module S64X7(
         `N_LBMS: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 1 << z[2:0];
 
           nia <= ia;
@@ -675,8 +636,6 @@ module S64X7(
         `N_LHMS: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 3 << {z[2:1], 1'b0};
 
           nia <= ia;
@@ -706,8 +665,6 @@ module S64X7(
         `N_LWMS: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 15 << {z[2], 2'b0};
 
           nia <= ia;
@@ -738,8 +695,6 @@ module S64X7(
         `N_LDMS: begin
           adr_o <= z[63:3];
           cyc_o <= 1;
-          we_o <= 0;
-          vpa_o <= 0;
           sel_o <= 8'b11111111;
 
           nia <= ia;
@@ -773,12 +728,6 @@ module S64X7(
       `OPC_INTOPS: begin
         case(dr[3:0])
         `N_ADD: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -805,12 +754,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SUB: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -837,12 +780,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SLL: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -869,12 +806,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SLT: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -901,12 +832,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SLTU: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -933,12 +858,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SGE: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -965,12 +884,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SGEU: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -997,12 +910,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SEQ: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1029,12 +936,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SNE: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1061,12 +962,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_XOR: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1093,12 +988,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SRL: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1125,12 +1014,6 @@ module S64X7(
           rsh_en <= 1;
         end
         `N_SRA: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1157,12 +1040,6 @@ module S64X7(
           rsh_en <= 1;
         end
         `N_OR: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1189,12 +1066,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_AND: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1221,12 +1092,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_BIC: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1258,12 +1123,6 @@ module S64X7(
       `OPC_JUMPS: begin
         case(dr[3:0])
         `N_JT8: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|z) ? ia + dr[11:4] : p;
           nt <= (|z) ? 0 : t+1;
@@ -1290,12 +1149,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JF8: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|z) ? p : ia + dr[11:4];
           nt <= (|z) ? t+1 : 0;
@@ -1322,12 +1175,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_J8: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= ia + dr[11:4];
           nt <= 0;
@@ -1354,12 +1201,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_CALL8: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= ia + dr[11:4];
           nt <= 0;
@@ -1386,12 +1227,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JT16: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|z) ? ia + dr[19:4] : p;
           nt <= (|z) ? 0 : t+1;
@@ -1418,12 +1253,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JF16: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|z) ? p : ia + dr[19:4];
           nt <= (|z) ? t+1 : 0;
@@ -1450,12 +1279,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_J16: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= ia + dr[19:4];
           nt <= 0;
@@ -1482,12 +1305,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_CALL16: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= ia + dr[19:4];
           nt <= 0;
@@ -1514,12 +1331,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JTI: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|y) ? z[63:3] : p;
           nt <= (|y) ? 0 : t+1;
@@ -1546,12 +1357,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JFI: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= (|y) ? p : z[63:3];
           nt <= (|y) ? t+1 : 0;
@@ -1578,12 +1383,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_JI: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= z[63:3];
           nt <= 0;
@@ -1610,12 +1409,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_CALLI: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= z[63:3];
           nt <= 0;
@@ -1645,12 +1438,6 @@ module S64X7(
       end
 
       `OPC_RET: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-
         nia <= ia;
         np <= rz[63:3];
         nt <= 0;
@@ -1680,12 +1467,6 @@ module S64X7(
       `OPC_STKOPS: begin
         case(dr[3:0])
         `N_DROP: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1712,12 +1493,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_DUP: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1744,12 +1519,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_OVER: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1776,12 +1545,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_SWAP: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1808,12 +1571,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_ROT: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1840,12 +1597,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_PUSH: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1872,12 +1623,6 @@ module S64X7(
           rsh_en <= 0;
         end
         `N_POP: begin
-          adr_o <= 0;
-          cyc_o <= 0;
-          we_o <= 0;
-          vpa_o <= 0;
-          sel_o <= 0;
-
           nia <= ia;
           np <= p;
           nt <= t+1;
@@ -1907,12 +1652,6 @@ module S64X7(
       end
 
       default: begin
-        adr_o <= 0;
-        cyc_o <= 0;
-        we_o <= 0;
-        vpa_o <= 0;
-        sel_o <= 0;
-
         nia <= ia;
         np <= p;
         nt <= t+1;
