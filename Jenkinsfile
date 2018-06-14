@@ -1,11 +1,6 @@
 pipeline {
     agent any 
     stages {
-        stage('Stage 1') {
-            steps {
-                echo 'Hello world!' 
-            }
-        }
         stage('Compile') {
           steps {
             sh 'iverilog -I rtl/verilog bench/verilog/S64X7.v rtl/verilog/*.v'
@@ -15,6 +10,11 @@ pipeline {
           steps {
             sh 'vvp -n a.out'
           }
+        }
+        stage('Success Stage') {
+            steps {
+                echo 'IT WORX!'
+            }
         }
     }
 }
