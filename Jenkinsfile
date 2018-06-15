@@ -8,7 +8,7 @@ pipeline {
         }
         stage('RunTest') {
           steps {
-            sh 'vvpx -n a.out'
+            sh 'vvp -n a.out'
           }
         }
         stage('Success Stage') {
